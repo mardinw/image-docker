@@ -1,72 +1,120 @@
-version: '3.5'
+version: '3'
 services:
-  #php:
-  #  image: dx46/php-fpm:7.4
-  #  networks:
-  #    app_net:
-  #      ipv4_address: 172.18.0.2
-  #  container_name: php
-  #  volumes:
-  #    - $HOME/Public/projek/:/var/www/html/
-  #    - .phplog:/var/log/php-fpm
-  #nginx:
-  #  image: nginx:alpine 
-  #  container_name: nginx
-  #  depends_on:
-  #    - db1
-  #    - db2
-  #    - db3
-  #  networks:
-  #    app_net:
-  #      ipv4_address: 172.18.0.3
-  #  ports:
-  #    - "8080:80"
-  #  volumes:
-  #    - $HOME/Public/projek/:/var/www/html/
-  #    - $HOME/Public/dok/:/var/www/html/dok/
-  #    - .nginxlog:/var/log/nginx
-  #    - ./etc/site.conf:/etc/nginx/conf.d/site.conf
+  php56:
+    image: localhost/php:5.6-fpm
+    container_name: php56
+    volumes:
+      #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
+      - /home/mardin/Public/diphp/diphp56:/var/www/html:z
+      - ./etc/php.ini:/usr/local/etc/php/php.ini:z
+      - .phplog:/var/log/php-fpm:z
+    networks:
+      backend:
+        ipv4_address: 10.89.3.2
+  php81:
+    image: localhost/php:8.1-fpm
+    container_name: php81
+    volumes:
+      #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
+      - /home/mardin/Public/diphp/diphp81:/var/www/html:z
+      - ./etc/php.ini:/usr/local/etc/php/php.ini:z
+      - .phplog:/var/log/php-fpm/:z
+    networks:
+      backend:
+        ipv4_address: 10.89.3.3
+  nginx1:
+    image: docker.io/library/nginx:alpine 
+    container_name: nginx1
+    ports:
+      - "8081:80"
+    volumes:
+      #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
+      - /home/mardin/Public/diphp/diphp56:/var/www/html/:z
+      - /home/mardin/Public/dok:/var/www/html/dok/:z
+      - .nginxlog1:/var/log/nginx/:z
+      - ./etc/site1.conf:/etc/nginx/conf.d/site.conf:z
+    depends_on:
+      - php56
+    networks:
+      backend:
+        ipv4_address: 10.89.3.6
+  nginx2:
+    image: docker.io/library/nginx:alpine 
+    container_name: nginx2
+    ports:
+      - "8082:80"
+    volumes:
+      #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
+      - /home/mardin/Public/diphp/diphp81:/var/www/html/:z
+      - /home/mardin/Public/dok:/var/www/html/dok/:z
+      - .nginxlog2:/var/log/nginx/:z
+      - ./etc/site2.conf:/etc/nginx/conf.d/site.conf:z
+    depends_on:
+      - php81
+    networks:
+      backend:
+        ipv4_address: 10.89.3.7
+  # # wp:
+  #   image: wordpress:php8.1-fpm-alpine
+  #   container_name: wp  
+  #   restart: always
+  #   networks:
+  #     app_net:
+  #       ipv4_address: 172.18.0.2
+  #   ports:
+  #     - "8080:80"
+  #   environment:
+  #     WORDPRESS_DB_HOST: 172.18.0.5
+  #     WORDPRESS_DB_USER: mardin
+  #     WORDPRESS_DB_PASSWORD: udin4j4
+  #     WORDPRESS_DB_NAME: wordsejoli
+  #   volumes:
+  #     - $HOME/Public/diphp/:/var/www/html
   db1:
     restart: always
-    image: postgres:12-alpine
+    image: docker.io/library/postgres:15-alpine
     container_name: db1
     volumes:
-      - .postg:/var/lib/postgresql/data/:rw
-    networks:
-      app_net:
-        ipv4_address: 172.18.0.4
+      - .postg:/var/lib/postgresql/data:z
     environment:
       - POSTGRES_USER=petro
       - POSTGRES_PASSWORD=udin4j4
-      - PGDATA:/var/lib/postgresql/data
-  #db2:
-  #  restart: always
-  #  image: mariadb:10.7-focal 
-  #  container_name: db2
-  #  volumes:
-  #    - .mysql:/var/lib/mysql
-  #  networks:
-  #    app_net:
-  #      ipv4_address: 172.18.0.5
-
-  #  ports:
-  #    - 3306:3306
-  #  environment:
-  #      MYSQL_ROOT_PASSWORD: "udin4j4"
-  db3:
-    image: redis:5-alpine
-    container_name: db3
+      - PGDATA:/var/lib/postgresql/data:z
     networks:
-      app_net:
-        ipv4_address: 172.18.0.6
+      backend:
+        ipv4_address: 10.89.3.11
+  db2:
+    restart: always
+    image: docker.io/library/mariadb:10.5
+    container_name: db2
+    volumes:
+      - .mysql:/var/lib/mysql:z
+    environment:
+      - MARIADB_ROOT_PASSWORD=udin4j4
+    networks:
+      backend:
+        ipv4_address: 10.89.3.12
+  db3:
+    image: docker.io/library/redis:6-alpine
+    container_name: db3
     ports:
       - "6379:6379"
     volumes:
-      - .redisdata:/data:rw
+      - .redisdata:/data:z
       #- ./etc/redis.conf:/redis.conf
+    networks:
+      backend:
+        ipv4_address: 10.89.3.13
+          # volumes:
+          #   php56:
+          #   php81:
+          #   nginx1:
+          #   nginx2:
+          #   db1:
+          #   db3:
 networks:
-  app_net:
+  backend:
+    driver: bridge
     ipam:
-      driver: default 
       config:
-        - subnet: 172.18.0.0/24
+        - subnet: "10.89.3.0/24"
