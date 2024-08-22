@@ -1,2 +1,8 @@
 *.un
-asterisk/asterisk-21.3.1.tar.gz
+database/.apache1
+database/.mysql
+database/.nginxlog1
+database/.nginxlog2
+database/.phplog
+database/.postg
+database/.redisdata
