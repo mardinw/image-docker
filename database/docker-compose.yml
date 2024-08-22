@@ -5,9 +5,9 @@ services:
     container_name: php56
     volumes:
       #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
-      - /home/mardin/Public/diphp/diphp56:/var/www/html:z
-      - ./etc/php.ini:/usr/local/etc/php/php.ini:z
-      - .phplog:/var/log/php-fpm:z
+      - /home/mardin/Public/diphp/diphp56:/var/www/html/
+      - ./etc/php.ini:/usr/local/etc/php/php.ini
+      - .phplog:/var/log/php-fpm/
     networks:
       backend:
         ipv4_address: 10.89.3.2
@@ -16,28 +16,43 @@ services:
     container_name: php81
     volumes:
       #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
-      - /home/mardin/Public/diphp/diphp81:/var/www/html:z
-      - ./etc/php.ini:/usr/local/etc/php/php.ini:z
-      - .phplog:/var/log/php-fpm/:z
+      - /home/mardin/Public/diphp/diphp81:/var/www/html/
+      - ./etc/php.ini:/usr/local/etc/php/php.ini
+      - .phplog:/var/log/php-fpm/
     networks:
       backend:
         ipv4_address: 10.89.3.3
-  nginx1:
-    image: docker.io/library/nginx:alpine 
-    container_name: nginx1
+  apache1:
+    image: docker.io/library/httpd:2.4-alpine
+    container_name: apache1
     ports:
       - "8081:80"
     volumes:
-      #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
-      - /home/mardin/Public/diphp/diphp56:/var/www/html/:z
-      - /home/mardin/Public/dok:/var/www/html/dok/:z
-      - .nginxlog1:/var/log/nginx/:z
-      - ./etc/site1.conf:/etc/nginx/conf.d/site.conf:z
+      #- ./etc/demo.apache.conf:/usr/local/apache2/conf/demo.apache.conf
+      - ./etc/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - .apache1:/var/log/apache2/
+      - /home/mardin/Public/diphp/diphp56:/var/www/html/
     depends_on:
       - php56
     networks:
       backend:
         ipv4_address: 10.89.3.6
+          # nginx1:
+          #   image: docker.io/library/nginx:alpine 
+          #   container_name: nginx1
+          #   ports:
+          #     - "8081:80"
+          #   volumes:
+          #     #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
+          #     - /home/mardin/Public/diphp/diphp56:/var/www/html/
+          #     - /home/mardin/Public/dok:/var/www/html/dok/
+          #     - .nginxlog1:/var/log/nginx/
+          #     - ./etc/site1.conf:/etc/nginx/conf.d/site.conf
+          #   depends_on:
+          #     - php56
+          #   networks:
+          #     backend:
+          #       ipv4_address: 10.89.3.6
   nginx2:
     image: docker.io/library/nginx:alpine 
     container_name: nginx2
@@ -45,10 +60,10 @@ services:
       - "8082:80"
     volumes:
       #- $HOME/Public/diphp/pos/pos_gudang/:/var/www/html/
-      - /home/mardin/Public/diphp/diphp81:/var/www/html/:z
-      - /home/mardin/Public/dok:/var/www/html/dok/:z
-      - .nginxlog2:/var/log/nginx/:z
-      - ./etc/site2.conf:/etc/nginx/conf.d/site.conf:z
+      - /home/mardin/Public/diphp/diphp81:/var/www/html/
+      - /home/mardin/Public/dok:/var/www/html/dok/
+      - .nginxlog2:/var/log/nginx/
+      - ./etc/site2.conf:/etc/nginx/conf.d/site.conf
     depends_on:
       - php81
     networks:
@@ -75,11 +90,11 @@ services:
     image: docker.io/library/postgres:15-alpine
     container_name: db1
     volumes:
-      - .postg:/var/lib/postgresql/data:z
+      - .postg:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=petro
       - POSTGRES_PASSWORD=udin4j4
-      - PGDATA:/var/lib/postgresql/data:z
+      - PGDATA:/var/lib/postgresql/data/
     networks:
       backend:
         ipv4_address: 10.89.3.11
@@ -88,7 +103,7 @@ services:
     image: docker.io/library/mariadb:10.5
     container_name: db2
     volumes:
-      - .mysql:/var/lib/mysql:z
+      - .mysql:/var/lib/mysql/
     environment:
       - MARIADB_ROOT_PASSWORD=udin4j4
     networks:
@@ -100,7 +115,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - .redisdata:/data:z
+      - .redisdata:/data/
       #- ./etc/redis.conf:/redis.conf
     networks:
       backend:
