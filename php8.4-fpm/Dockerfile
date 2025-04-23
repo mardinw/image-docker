@@ -9,5 +9,5 @@ RUN apk update && apk add --no-cache freetype-dev \
     libpng-dev \
     postgresql-dev \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd pdo zip mysqli pdo_mysql \
+    && docker-php-ext-install -j$(nproc) gd pdo zip mysqli pdo_mysql pgsql pdo_pgsql \
     && docker-php-ext-enable opcache
